@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lp.dao.RecommendDao">
+
+    <resultMap id="RecommendWithBook" type="Recommend">
+        <id column="u_id" property="u_id"></id>
+        <result column="b_id" property="b_id"></result>
+        <collection property="bookList" ofType="Book">
+            <id column="b_id" property="id"></id>
+            <result column="b_name" property="name"></result>
+            <result column="b_author" property="author"></result>
+            <result column="b_publisher" property="publisher"></result>
+            <result column="b_ptime" property="ptime"></result>
+            <result column="b_img" property="img"></result>
+            <result column="b_pnum" property="pagenum"></result>
+            <result column="b_price" property="price"></result>
+            <result column="b_ISBN" property="ISBN"></result>
+            <result column="b_grade" property="grade"></result>
+            <result column="b_enum" property="evalnum"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectRecommend" parameterType="Integer" resultMap="RecommendWithBook">
+        select u_id,r.b_id,b.* from recommend r,book_context b where r.b_id = b.b_id and u_id = #{id}
+    </select>
+
+</mapper>

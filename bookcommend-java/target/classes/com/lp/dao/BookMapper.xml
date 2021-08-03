@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lp.dao.BookDao">
+
+    <resultMap id="BookResult" type="Book">
+        <id column="b_id" property="id"></id>
+        <result column="b_name" property="name"></result>
+        <result column="b_author" property="author"></result>
+        <result column="b_publisher" property="publisher"></result>
+        <result column="b_ptime" property="ptime"></result>
+        <result column="b_img" property="img"></result>
+        <result column="b_pnum" property="pagenum"></result>
+        <result column="b_price" property="price"></result>
+        <result column="b_ISBN" property="ISBN"></result>
+        <result column="b_grade" property="grade"></result>
+        <result column="b_enum" property="evalnum"></result>
+    </resultMap>
+
+    <select id="selectBookByISBN" parameterType="String" resultMap="BookResult">
+        select * from book_context where b_ISBN = #{ISBN}
+    </select>
+
+    <select id="selectBookByISBNOrName" resultMap="BookResult">
+        select * from book_context
+        <where>
+            <if test="ISBN != null and ISBN != '' ">
+                or b_ISBN = #{ISBN}
+            </if>
+            <if test="name != null and name != '' ">
+                or b_name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectBookByName" parameterType="String" resultMap="BookResult">
+        select * from book_context where b_name like concat('%',#{name},'%')
+    </select>
+
+</mapper>

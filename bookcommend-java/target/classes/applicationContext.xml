@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           ">
+
+    <context:property-placeholder location="classpath:db.properties" />
+
+    <!--  1.配置数据源    -->
+    <!--  Druid连接池    -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!--  基本配置 -->
+        <!--  -->
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <!--  -->
+        <property name="url" value="${jdbc.url}"></property>
+        <!--  -->
+        <property name="username" value="${jdbc.username}"></property>
+        <!--  -->
+        <property name="password" value="${jdbc.password}"></property>
+        <!--  配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${jdbc.init}"></property>
+        <property name="minIdle" value="${jdbc.minIdle}"></property>
+        <property name="maxActive" value="${jdbc.maxActive}"></property>
+    </bean>
+
+    <!-- 配置SqlSessionFactory  -->
+    <!-- 定义工厂bean：生成SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--  注入连接池-->
+        <property name="dataSource" ref="dataSource"></property>
+
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:com/lp/dao/*.xml</value>
+            </list>
+        </property>
+
+        <!--  为dao-mapper文件中实体 定义缺省包路径 -->
+        <property name="typeAliasesPackage" value="com.lp.entity"></property>
+
+    </bean>
+
+    <!-- mapperScannerConfigurer    UserDao==>userDao   -->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.lp.dao"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!--    引入一个事务管理器，其中依赖DataSource，借以获得连接，进而控制事务逻辑   -->
+    <bean id="tx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--  告知Spring 哪些包中有被注解的类、属性、方法 -->
+    <context:component-scan base-package="com.lp" use-default-filters="true">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--  @Transactional定制事务时 基于的事务管理器  -->
+    <tx:annotation-driven transaction-manager="tx" />
+
+    <!--  启用aop注解  -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+</beans>
